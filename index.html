@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> AJAX (XMLHttpRequest)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            font-size: 1rem;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Consulta de CEP AJAX (XMLHttpRequest)</h2>
+        <div class="form-group">
+            <label for="cep">Digite o CEP:</label>
+            <input type="text" id="cep" placeholder="Ex: 01001-000" maxlength="9">
+        </div>
+        <button onclick="consultarCep()">Consultar</button>
+
+        <div class="result" id="result"></div>
+    </div>
+    <script>
+        function consultarCep() {
+            var cep = document.getElementById('cep').value;
+
+            if (cep === "") {
+                alert("Por favor, insira um CEP.");
+                return;
+            }
+
+            cep = cep.replace(/\D/g, '');
+
+            if (cep.length !== 8) {
+                alert("O CEP deve ter 8 dígitos.");
+                return;
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://viacep.com.br/ws/" + cep + "/json/", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    exibirResultado(response);
+                }
+            };
+            xhr.send();
+        }
+
+        function exibirResultado(dados) {
+            var resultDiv = document.getElementById('result');
+            if ("erro" in dados) {
+                resultDiv.innerHTML = "<p>CEP não encontrado.</p>";
+            } else {
+                resultDiv.innerHTML = `
+                    <p><strong>CEP:</strong> ${dados.cep}</p>
+                    <p><strong>Logradouro:</strong> ${dados.logradouro}</p>
+                    <p><strong>Bairro:</strong> ${dados.bairro}</p>
+                    <p><strong>Cidade:</strong> ${dados.localidade}</p>
+                    <p><strong>Estado:</strong> ${dados.uf}</p>
+                `;
+            }
+        }
+    </script>
+
+    <a style="color: red;" href="FetchAPI.html">Ir para Fetch API</a>
+
+</body>
+</html>
